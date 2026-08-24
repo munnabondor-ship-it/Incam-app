@@ -1,0 +1,4 @@
+<!DOCTYPE html><html><head><title>Demo Cash App</title><style>body { background-color: #0b1426; color: white; font-family: Arial; text-align: center; padding: 20px; }
+        .card { background: #162238; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .btn { background: #00d2ff; border: none; color: black; padding: 12px 25px; border-radius: 8px; font-weight: bold; margin-top: 15px; }
+    </style></head><body><h2>🚀 ফ্লেক্স ক্যাশ (ডেমো) 💸</h2><div class="card"><h3>আপনার ব্যালেন্স</h3><h1 style="color: #00ff88;">TK 500.00</h1><p>প্রতি অ্যাডে পাবেন: TK 20.00</p><button class="btn" onclick="alert('এটি একটি ভুয়া ডেমো অ্যাপ!')">বিজ্ঞাপন দেখুন</button></div></body></html>
