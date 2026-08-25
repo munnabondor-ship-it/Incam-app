@@ -1,1 +1,230 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flex Cash</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #0b1329; color: #ffffff; padding: 16px; display: flex; flex-direction: column; align-items: center; }
+    
+    .header { text-align: center; margin-bottom: 15px; }
+    .header h2 { font-size: 20px; color: #38bdf8; }
 
+    .main-card {
+      background: #162238; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; text-align: center; border: 1px solid #1e2d4a; margin-bottom: 15px;
+    }
+    .balance-amount { font-size: 30px; font-weight: bold; color: #10b981; margin: 8px 0; }
+    .reward-info { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
+
+    /* Button Variations */
+    .btn-main { background: #10b981; color: #000; border: none; padding: 12px; width: 100%; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    
+    /* Dynamic Options Menu */
+    .options-container { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 10px; }
+    
+    .option-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 12px; cursor: pointer; transition: transform 0.1s; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .option-item:active { transform: scale(0.98); }
+    .option-left { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: bold; }
+    .option-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+    /* Custom Colors for Options */
+    .opt-withdraw { background: #0f2942; border-left: 4px solid #00e5ff; }
+    .opt-withdraw .option-icon { background: #00e5ff22; color: #00e5ff; }
+
+    .opt-deposit { background: #1a271d; border-left: 4px solid #10b981; }
+    .opt-deposit .option-icon { background: #10b98122; color: #10b981; }
+
+    .opt-history { background: #2a2115; border-left: 4px solid #f59e0b; }
+    .opt-history .option-icon { background: #f59e0b22; color: #f59e0b; }
+
+    .opt-refer { background: #241633; border-left: 4px solid #a855f7; }
+    .opt-refer .option-icon { background: #a855f722; color: #a855f7; }
+
+    .opt-support { background: #132733; border-left: 4px solid #3b82f6; }
+    .opt-support .option-icon { background: #3b82f622; color: #3b82f6; }
+
+    .opt-leader { background: #2b1820; border-left: 4px solid #ec4899; }
+    .opt-leader .option-icon { background: #ec489922; color: #ec4899; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:99; }
+    .modal-box { background: #162238; padding: 20px; border-radius: 14px; width: 85%; max-width: 310px; border: 1px solid #1e2d4a; }
+    .modal-box h3 { color: #38bdf8; margin-bottom: 12px; }
+    .input-box { width: 100%; padding: 10px; margin: 6px 0 12px; background: #0b1329; border: 1px solid #1e2d4a; color: #fff; border-radius: 6px; }
+    .btn-close { background: #475569; color: #fff; border: none; padding: 8px; width: 100%; border-radius: 6px; cursor: pointer; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>🚀 ফ্লেক্স ক্যাশ 💸</h2>
+  </div>
+
+  <div class="main-card">
+    <div style="font-size:13px; color:#94a3b8;">আপনার ব্যালেন্স</div>
+    <div class="balance-amount">TK <span id="balance">500.00</span></div>
+    <div class="reward-info">প্রতি অ্যাডে পাবেন: TK 20.00</div>
+    <button class="btn-main" onclick="addReward()">📺 বিজ্ঞাপন দেখুন</button>
+  </div>
+
+  <!-- অপশন সমূহ -->
+  <div class="options-container">
+    
+    <div class="option-item opt-withdraw" onclick="openModal('withdrawModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-wallet"></i></div>
+        <span>উইথড্র করুন</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#00e5ff;"></i>
+    </div>
+
+    <div class="option-item opt-deposit" onclick="openModal('depositModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <span>ডিপোজিট করুন</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#10b981;"></i>
+    </div>
+
+    <div class="option-item opt-history" onclick="openModal('historyModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <span>ট্রানজেকশন হিস্ট্রি</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#f59e0b;"></i>
+    </div>
+
+    <div class="option-item opt-refer" onclick="openModal('referModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <span>রেফার ও ইনকাম</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
+    </div>
+
+    <div class="option-item opt-leader" onclick="openModal('leaderModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-trophy"></i></div>
+        <span>লিডারবোর্ড</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#ec4899;"></i>
+    </div>
+
+    <div class="option-item opt-support" onclick="openModal('supportModal')">
+      <div class="option-left">
+        <div class="option-icon"><i class="fa-solid fa-headset"></i></div>
+        <span>হেল্প ও সাপোর্ট</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#3b82f6;"></i>
+    </div>
+
+  </div>
+
+  <!-- ১. উইথড্র মডাল -->
+  <div id="withdrawModal" class="modal">
+    <div class="modal-box">
+      <h3>উইথড্র রিকোয়েস্ট</h3>
+      <select class="input-box">
+        <option>বিকাশ</option>
+        <option>নগদ</option>
+      </select>
+      <input type="text" class="input-box" placeholder="একাউন্ট নম্বর">
+      <input type="number" id="wAmount" class="input-box" placeholder="পরিমাণ (নূন্যতম ৫০০)">
+      <button class="btn-main" style="background:#00e5ff;" onclick="processWithdraw()">উইথড্র দিন</button>
+      <button class="btn-close" onclick="closeModal('withdrawModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- ২. ডিপোজিট মডাল -->
+  <div id="depositModal" class="modal">
+    <div class="modal-box">
+      <h3>ডিপোজিট করুন</h3>
+      <select class="input-box"><option>বিকাশ (Personal)</option><option>নগদ (Personal)</option></select>
+      <input type="number" class="input-box" placeholder="টাকার পরিমাণ">
+      <input type="text" class="input-box" placeholder="TrxID (ট্রানজেকশন আইডি)">
+      <button class="btn-main" style="background:#10b981;" onclick="alert('ডিপোজিট সাবমিট হয়েছে!'); closeModal('depositModal');">জমা দিন</button>
+      <button class="btn-close" onclick="closeModal('depositModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- ৩. হিস্ট্রি মডাল -->
+  <div id="historyModal" class="modal">
+    <div class="modal-box">
+      <h3>লেনদেন ইতিহাস</h3>
+      <p style="font-size:12px; color:#94a3b8; text-align:center; padding:10px;">সম্প্রতি কোনো লেনদেন নেই</p>
+      <button class="btn-close" onclick="closeModal('historyModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- ৪. রেফার মডাল -->
+  <div id="referModal" class="modal">
+    <div class="modal-box">
+      <h3>রেফার লিংক</h3>
+      <input type="text" id="refLink" class="input-box" value="https://t.me/FlexCashBot?start=123" readonly>
+      <button class="btn-main" style="background:#a855f7; color:#fff;" onclick="copyLink()">লিংক কপি করুন</button>
+      <button class="btn-close" onclick="closeModal('referModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- ৫. লিডারবোর্ড মডাল -->
+  <div id="leaderModal" class="modal">
+    <div class="modal-box">
+      <h3>সেরা ১০ ইনকামার</h3>
+      <p style="font-size:13px; color:#94a3b8;">১. রহিম - TK 2500<br>২. করিম - TK 1800</p>
+      <button class="btn-close" onclick="closeModal('leaderModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- ৬. সাপোর্ট মডাল -->
+  <div id="supportModal" class="modal">
+    <div class="modal-box">
+      <h3>কাস্টমার সাপোর্ট</h3>
+      <p style="font-size:13px; color:#94a3b8; margin-bottom:10px;">যেকোনো প্রয়োজনে আমাদের টেলিগ্রাম হেল্পডেস্কে যোগাযোগ করুন।</p>
+      <button class="btn-main" style="background:#3b82f6; color:#fff;" onclick="window.open('https://t.me/')">টেলিগ্রাম সাপোর্ট</button>
+      <button class="btn-close" onclick="closeModal('supportModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    let balance = 500.00;
+
+    function addReward() {
+      balance += 20.00;
+      document.getElementById('balance').innerText = balance.toFixed(2);
+      alert("বিজ্ঞাপন দেখার জন্য ২০ টাকা যোগ হয়েছে!");
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function copyLink() {
+      let link = document.getElementById('refLink');
+      link.select();
+      navigator.clipboard.writeText(link.value);
+      alert("রেফার লিংক কপি হয়েছে!");
+    }
+
+    function processWithdraw() {
+      let amt = parseFloat(document.getElementById('wAmount').value);
+      if (amt && amt <= balance) {
+        balance -= amt;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+        alert("উইথড্র রিকোয়েস্ট সফল হয়েছে!");
+        closeModal('withdrawModal');
+      } else {
+        alert("পর্যাপ্ত ব্যালেন্স নেই বা সঠিক পরিমাণ দিন!");
+      }
+    }
+  </script>
+</body>
+</html>
