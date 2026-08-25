@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flex Cash</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #10b981;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+    }
 
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--text-color);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .balance-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .balance-amount {
+      font-size: 36px;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin: 10px 0;
+    }
+
+    .reward-info {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: var(--accent-color);
+      color: #000;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>🚀 ফ্লেক্স ক্যাশ (অফিশিয়াল) 💸</h2>
+  </div>
+
+  <div class="card">
+    <div class="balance-label">আপনার ব্যালেন্স</div>
+    <div class="balance-amount">TK <span id="balance">500.00</span></div>
+    <div class="reward-info">প্রতি অ্যাডে পাবেন: TK 20.00</div>
+    <button class="btn" onclick="addReward()">বিজ্ঞাপন দেখুন</button>
+  </div>
+
+  <script>
+    // Telegram SDK ইনিশিয়ালাইজেশন
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // ফুলস্ক্রিন ভিউ
+
+    let currentBalance = 500.00;
+
+    function addReward() {
+      currentBalance += 20.00;
+      document.getElementById('balance').innerText = currentBalance.toFixed(2);
+      
+      // ফোনের ভাইব্রেশন ইফেক্ট (Telegram Haptic)
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('medium');
+      }
+    }
+  </script>
+
+</body>
+</html>
