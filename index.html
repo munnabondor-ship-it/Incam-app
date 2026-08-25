@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fly Cash BD</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #070d19; color: #ffffff; padding-bottom: 75px; }
 
+    .header { text-align: center; padding: 16px; background: #0f172a; border-bottom: 1px solid #1e293b; }
+    .header h2 { font-size: 20px; color: #00e5ff; }
+
+    .page { display: none; padding: 16px; }
+    .page.active { display: block; }
+
+    /* Cards & Grids */
+    .card { background: #162238; border-radius: 14px; padding: 18px; margin-bottom: 14px; border: 1px solid #1e2d4a; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-title { font-size: 13px; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .stat-value { font-size: 20px; font-weight: bold; color: #00e5ff; }
+
+    /* Buttons */
+    .btn { background: #00e5ff; color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 10px; font-size: 15px; }
+    .btn-withdraw { background: #00e5ff; font-size: 16px; padding: 14px; color: #000; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
+
+    /* Menu Lists (Wallet Screen) */
+    .menu-item { display: flex; align-items: center; justify-content: space-between; background: #162238; padding: 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #1e2d4a; cursor: pointer; }
+    .menu-left { display: flex; align-items: center; gap: 14px; }
+    .menu-left i { font-size: 22px; color: #00e5ff; }
+
+    /* Progress Bar */
+    .progress-bar { background: #1e2d4a; border-radius: 10px; height: 10px; width: 100%; margin: 10px 0; overflow: hidden; }
+    .progress-fill { background: #00e5ff; height: 100%; width: 100%; }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0b1329; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #1e293b; z-index: 10; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 11px; cursor: pointer; }
+    .nav-item i { font-size: 20px; margin-bottom: 4px; }
+    .nav-item.active { color: #00e5ff; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
+    .modal-box { background: #162238; padding: 20px; border-radius: 14px; width: 85%; max-width: 320px; border: 1px solid #1e2d4a; }
+    .input-box { width: 100%; padding: 10px; margin: 8px 0 12px; background: #070d19; border: 1px solid #1e2d4a; color: #fff; border-radius: 8px; font-size: 14px; }
+    .btn-close { background: #ef4444; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>Fly Cash 🚀 টাকা উড়াও 💸 <i class="fa-solid fa-circle-check" style="color:#00e5ff; font-size:16px;"></i></h2>
+  </div>
+
+  <!-- ১. হোম পেজ (HOME) -->
+  <div id="home" class="page active">
+    <div class="grid-2">
+      <div class="card"><div class="stat-title"><i class="fa-solid fa-bolt" style="color:#00e5ff;"></i> মোট টাস্ক</div><div class="stat-value">4</div></div>
+      <div class="card"><div class="stat-title"><i class="fa-solid fa-user-group" style="color:#00e5ff;"></i> মোট রেফার</div><div class="stat-value">0</div></div>
+      <div class="card"><div class="stat-title"><i class="fa-solid fa-video" style="color:#00e5ff;"></i> অ্যাড দেখা হয়েছে</div><div class="stat-value">15</div></div>
+      <div class="card"><div class="stat-title"><i class="fa-solid fa-sack-dollar" style="color:#00e5ff;"></i> বোনাস ব্যালেন্স</div><div class="stat-value">TK <span id="main-balance">500.00</span></div></div>
+    </div>
+
+    <div class="card" style="text-align: center; margin-top: 10px;">
+      <h3>🎉 Daily Bonus</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin: 6px 0;">প্রতিদিন বোনাস সংগ্রহ করুন ➡️ Claim your bonus every day</p>
+      <div style="font-size: 12px; color: #00e5ff; margin-bottom: 10px;">Progress: 1/7 দিন</div>
+      <button class="btn" onclick="alert('দৈনিক বোনাস দাবি করা হয়েছে!')">দৈনিক বোনাস সংগ্রহ করুন</button>
+    </div>
+  </div>
+
+  <!-- ২. টাস্ক পেজ (TASKS) -->
+  <div id="tasks" class="page">
+    <div class="card" style="text-align: center;">
+      <i class="fa-solid fa-bullhorn" style="font-size: 40px; color: #00e5ff; margin-bottom: 10px;"></i>
+      <h3>অ্যাড দেখুন</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">প্রতিটি অ্যাড দেখলে TK 20.00 ইনকাম করুন</p>
+      <div style="background: rgba(0,229,255,0.1); color: #00e5ff; padding: 8px; border-radius: 20px; margin: 12px 0; font-size: 14px; font-weight: bold;">
+        💵 রিওয়ার্ড: TK 20.00
+      </div>
+      <div style="margin: 15px 0;">
+        <span style="font-size: 12px; color: #94a3b8;">আজকের কাজ সম্পন্ন</span>
+        <span style="float: right; font-size: 12px; font-weight: bold;">15 / 15</span>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+      <button class="btn btn-disabled">দৈনিক লিমিট শেষ</button>
+    </div>
+
+    <div class="menu-item" onclick="alert('টেলিগ্রাম চ্যানেলে যুক্ত হন')">
+      <div class="menu-left">
+        <i class="fa-brands fa-telegram"></i>
+        <div><b>অফিশিয়াল চ্যানেল</b><br><small style="color:#10b981;">রিওয়ার্ড: TK 70.00</small></div>
+      </div>
+      <button class="btn" style="width: auto; padding: 6px 14px; margin:0;">সম্পন্ন</button>
+    </div>
+
+    <div class="menu-item" onclick="alert('পেমেন্ট চ্যানেলে যুক্ত হন')">
+      <div class="menu-left">
+        <i class="fa-brands fa-telegram"></i>
+        <div><b>পেমেন্ট চ্যানেল</b><br><small style="color:#10b981;">রিওয়ার্ড: TK 70.00</small></div>
+      </div>
+      <button class="btn" style="width: auto; padding: 6px 14px; margin:0;">সম্পন্ন</button>
+    </div>
+  </div>
+
+  <!-- ৩. সাপোর্ট পেজ (SUPPORT) -->
+  <div id="support" class="page">
+    <div class="card" style="text-align: center;">
+      <h3 style="margin-bottom: 8px;">কাজের ভিডিও / টিউটোরিয়াল</h3>
+      <div style="background: #00e5ff; color: #000; padding: 20px; border-radius: 12px; margin: 10px 0;">
+        <h3 style="margin-bottom: 6px;">কিভাবে কাজ করবেন?</h3>
+        <p style="font-size: 12px; margin-bottom: 12px;">কাজ শুরু করার আগে এই ভিডিওটি দেখে নিন। ভিডিওতে সম্পূর্ণভাবে দেখানো হয়েছে কিভাবে সঠিক নিয়মে কাজ করতে হয়।</p>
+        <button class="btn" style="background: #070d19; color: #fff; width: auto; padding: 8px 16px; margin:0;" onclick="window.open('https://youtube.com')">📺 ভিডিও দেখুন</button>
+      </div>
+    </div>
+
+    <div class="card" style="text-align: center; padding: 20px;">
+      <i class="fa-brands fa-telegram" style="font-size: 45px; color: #00e5ff; margin-bottom: 10px;"></i>
+      <h3>কাস্টমার সাপোর্ট</h3>
+      <p style="font-size: 12px; color: #94a3b8; margin: 8px 0;">যেকোনো সমস্যার সমাধানের জন্য আমাদের সাথে যোগাযোগ করুন</p>
+      <button class="btn" onclick="window.open('https://t.me/')">মেসেজ দিন</button>
+    </div>
+  </div>
+
+  <!-- ৪. রেফার পেজ (REFER) -->
+  <div id="refer" class="page">
+    <div class="card" style="text-align: center;">
+      <i class="fa-solid fa-gift" style="font-size: 35px; color: #00e5ff; margin-bottom: 8px;"></i>
+      <h3>বন্ধুদের রেফার করুন এবং ইনকাম করুন</h3>
+      <p style="font-size: 12px; color: #94a3b8; margin: 8px 0;">আপনার রেফারেল লিংক শেয়ার করুন এবং বন্ধুদের আমন্ত্রণ জানান। যখন আপনার বন্ধু সাইন আপ করবে, আপনি পাবেন <b>100.00 টাকা</b> বোনাস।</p>
+      <div style="background: rgba(0,229,255,0.1); color: #00e5ff; padding: 8px; border-radius: 20px; margin: 10px 0; font-size: 13px;">
+        😊 প্রতি রেফারে বোনাস 100.00 টাকা
+      </div>
+      <input type="text" id="ref-link" class="input-box" value="https://t.me/FlyCashBD1bot?start=12345" readonly>
+      <div class="grid-2">
+        <button class="btn" onclick="copyReferLink()"><i class="fa-solid fa-copy"></i> লিংক কপি</button>
+        <button class="btn" style="background:#3b82f6; color:#fff;" onclick="alert('শেয়ার করা হচ্ছে...')"><i class="fa-solid fa-share"></i> শেয়ার করুন</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b>রেফার করা বন্ধুদের তালিকা</b>
+        <span style="background:#00e5ff; color:#000; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:bold;">মোট: 0</span>
+      </div>
+      <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 25px;"><i class="fa-solid fa-user-group" style="font-size:30px;"><br><br></i>এখনো কোনো বন্ধু নেই</p>
+    </div>
+  </div>
+
+  <!-- ৫. ওয়ালেট পেজ (WALLET) -->
+  <div id="wallet" class="page">
+    <button class="btn btn-withdraw" onclick="openModal('withdrawModal')">
+      <i class="fa-solid fa-circle-dollar-to-slot"></i> এখনই উইথড্র করুন
+    </button>
+    <br>
+
+    <div class="menu-item" onclick="openModal('historyModal')">
+      <div class="menu-left"><i class="fa-solid fa-clock-rotate-left"></i><div><b>ট্রানজেকশন হিস্ট্রি</b><br><small style="color:#94a3b8;">আপনার সব ইনকাম রেকর্ড দেখুন</small></div></div>
+      <i class="fa-solid fa-chevron-right" style="color:#64748b;"></i>
+    </div>
+
+    <div class="menu-item" onclick="openModal('historyModal')">
+      <div class="menu-left"><i class="fa-solid fa-chart-line"></i><div><b>উইথড্র হিস্ট্রি</b><br><small style="color:#94a3b8;">আপনার উইথড্র রেকর্ড দেখুন</small></div></div>
+      <i class="fa-solid fa-chevron-right" style="color:#64748b;"></i>
+    </div>
+
+    <div class="menu-item" onclick="switchTab('support')">
+      <div class="menu-left"><i class="fa-solid fa-circle-info"></i><div><b>সাপোর্ট</b><br><small style="color:#94a3b8;">আমাদের সাথে যোগাযোগ করুন</small></div></div>
+      <i class="fa-solid fa-chevron-right" style="color:#64748b;"></i>
+    </div>
+
+    <div class="menu-item" onclick="openModal('leaderModal')">
+      <div class="menu-left"><i class="fa-solid fa-ranking-star"></i><div><b>লিডারবোর্ড</b><br><small style="color:#94a3b8;">সেরা ১০ ইনকামার দেখুন</small></div></div>
+      <i class="fa-solid fa-chevron-right" style="color:#64748b;"></i>
+    </div>
+
+    <div class="menu-item" style="border-color: rgba(239, 68, 68, 0.4);" onclick="alert('অ্যাকোউন্ট লগআউট সফল!')">
+      <div class="menu-left"><i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i><div><b style="color:#ef4444;">লগআউট</b><br><small style="color:#94a3b8;">অ্যাকাউন্ট থেকে বের হয়ে যান</small></div></div>
+      <i class="fa-solid fa-chevron-right" style="color:#ef4444;"></i>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i>হোম</div>
+    <div class="nav-item" onclick="switchTab('tasks')"><i class="fa-solid fa-list-check"></i>টাস্ক</div>
+    <div class="nav-item" onclick="switchTab('support')"><i class="fa-solid fa-headset"></i>সাপোর্ট</div>
+    <div class="nav-item" onclick="switchTab('refer')"><i class="fa-solid fa-user-plus"></i>রেফার</div>
+    <div class="nav-item" onclick="switchTab('wallet')"><i class="fa-solid fa-wallet"></i>ওয়ালেট</div>
+  </div>
+
+  <!-- Withdraw Modal Window -->
+  <div id="withdrawModal" class="modal">
+    <div class="modal-box">
+      <h3 style="color:#00e5ff; margin-bottom:10px;">টাকা উত্তোলন (Withdraw)</h3>
+      <select class="input-box">
+        <option>বিকাশ (Bkash)</option>
+        <option>নগদ (Nagad)</option>
+      </select>
+      <input type="text" class="input-box" placeholder="নম্বর লিখুন">
+      <input type="number" id="wAmount" class="input-box" placeholder="পরিমাণ (নূন্যতম ৫০০)">
+      <button class="btn" onclick="processWithdraw()">উইথড্র দিন</button>
+      <button class="btn btn-close" onclick="closeModal('withdrawModal')">বাতিল</button>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div id="historyModal" class="modal">
+    <div class="modal-box">
+      <h3 style="color:#00e5ff; margin-bottom:10px;">হিস্ট্রি</h3>
+      <p style="font-size:13px; color:#94a3b8; text-align:center; padding:15px 0;">কোনো রেকর্ড পাওয়া যায়নি</p>
+      <button class="btn btn-close" onclick="closeModal('historyModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div id="leaderModal" class="modal">
+    <div class="modal-box">
+      <h3 style="color:#00e5ff; margin-bottom:10px;">সেরা ১০ ইনকামার</h3>
+      <p style="font-size:13px; color:#cbd5e1; line-height: 1.8;">
+        ১. মো: তানভীর — <b style="color:#10b981;">TK 4,500</b><br>
+        ২. সাকিব হাসান — <b style="color:#10b981;">TK 3,200</b>
+      </p>
+      <button class="btn btn-close" onclick="closeModal('leaderModal')">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    let balance = 500.00;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      
+      const indexMap = { 'home': 0, 'tasks': 1, 'support': 2, 'refer': 3, 'wallet': 4 };
+      document.querySelectorAll('.nav-item')[indexMap[tabId]].classList.add('active');
+    }
+
+    function copyReferLink() {
+      const copyText = document.getElementById("ref-link");
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      alert("রেফার লিংক কপি করা হয়েছে!");
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function processWithdraw() {
+      let amt = parseFloat(document.getElementById('wAmount').value);
+      if (amt && amt <= balance) {
+        balance -= amt;
+        document.getElementById('main-balance').innerText = balance.toFixed(2);
+        alert("উইথড্র রিকোয়েস্ট জমা দেওয়া হয়েছে!");
+        closeModal('withdrawModal');
+      } else {
+        alert("পর্যাপ্ত ব্যালেন্স নেই বা সঠিক পরিমাণ দিন!");
+      }
+    }
+  </script>
+</body>
+</html>
